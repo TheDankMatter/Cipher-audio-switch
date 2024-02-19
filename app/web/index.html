@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Audio Switch</title>
+    <!-- CSS could also be loaded from local storage or be embedded. --->
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.min.css">--->
+    <link rel="stylesheet" href="water.css">
+</head>
+<body>
+    <h1 style="text-align:center;">Cipher Audio Switch</h1>
+    <form style="text-align:center;" id="theme-form"> 
+        <button style="text-align:center;" onclick="handleButtonSwitchIOClick()">Switch IO</button> 
+        <button style="text-align:center;" onclick="handleButtonSwitchHeadphonesClick()">Switch Headphones</button> 
+        <button style="text-align:center;" onclick="handleButtonSwitchMicClick()">Switch Mic</button> 
+    </form>
+    <h3>Settings</h3> 
+    <table class="table">
+        <tr>
+            <td>
+                <label for="leds-color-select">LEDs Color:</label>
+            </td>
+            <td>
+                <select id="leds-color-select">
+                    <option value="red">Red</option>
+                    <option value="green">Green</option>
+                    <option value="blue">Blue</option>
+                    <option value="yellow">Yellow</option>
+                    <option value="cyan">Cyan</option>
+                    <option value="magenta">Magenta</option>
+                </select>            
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="leds-mode-select">LEDs Mode:</label>
+            </td>
+            <td>
+                <select id="leds-mode-select">
+                    <option value="0">Off</option>
+                    <option value="1">Always On</option>
+                    <option value="2">Turn Off After Delay</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="leds-brightness-slider">LEDs Brightness:</label>
+            </td>
+            <td>
+                <input type="range" id="leds-brightness-slider" min="0.2" max="1" step="0.2" value="1">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="side-button-mode-select">Side Button mode:</label>
+            </td>
+            <td>
+                <select id="side-button-mode-select">
+                    <option value="0">Disabled</option>
+                    <option value="1">Switch All</option>
+                    <option value="2">Switch Headphones</option>
+                    <option value="3">Switch Microphone</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="button1-mode-select">Remote Button 1 mode:</label>
+            </td>
+            <td>
+                <select id="button1-mode-select">
+                    <option value="0">Disabled</option>
+                    <option value="1">Switch All</option>
+                    <option value="2">Switch Headphones</option>
+                    <option value="3">Switch Microphone</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="button2-mode-select">Remote Button 2 mode:</label>
+            </td>
+            <td>
+                <select id="button2-mode-select">
+                    <option value="0">Disabled</option>
+                    <option value="1">Switch All</option>
+                    <option value="2">Switch Headphones</option>
+                    <option value="3">Switch Microphone</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+
+    <p style="text-align:center;">
+        <button onclick="handleSaveClick()">Save settings</button>
+    </p>
+    
+    <p style="text-align:center;">Content served by <a href="https://github.com/adafruit/Adafruit_CircuitPython_HTTPServer">CircuitPython HTTPServer</a> and styled with <a href="https://watercss.kognise.dev/">Water.css</a>.</p>
+    
+    <script>
+    window.addEventListener("load", () => {
+        console.log("on load triggered");
+        // Set the current dropdown item for "LEDs color"
+        var ledsColor = document.getElementById("leds-color-select");
+        var ledsMode = document.getElementById("leds-mode-select");
+        var ledsBrightness = document.getElementById("leds-brightness-slider");
+        var sideButtonMode = document.getElementById("side-button-mode-select");
+        var button1Mode = document.getElementById("button1-mode-select");
+        var button2Mode = document.getElementById("button2-mode-select");
+
+        fetch("/get_data")
+            .then(response => response.json())
+            .then(data => {
+                ledsColor.value = data.ledsColor;
+                ledsMode.value = data.ledsMode;
+                ledsBrightness.value = data.ledsBrightness;;
+                sideButtonMode.value = data.sideButtonMode;
+                button1Mode.value = data.remoteButton1Mode;
+                button2Mode.value = data.remoteButton2Mode;
+            })
+            .catch(error => console.error("Error:", error));
+    });
+
+    function handleButtonSwitchIOClick() {
+        fetch("/switch_relays").then(response => {
+            if (response.ok) {
+                console.log("Button pressed");
+            } else {
+                console.error("Error:", response.status);
+            }
+        });
+    }
+
+    function handleButtonSwitchHeadphonesClick() {
+        fetch("/switch_headphones").then(response => {
+            if (response.ok) {
+                console.log("Button pressed");
+            } else {
+                console.error("Error:", response.status);
+            }
+        });
+    }
+
+    function handleButtonSwitchMicClick() {
+        fetch("/switch_mic").then(response => {
+            if (response.ok) {
+                console.log("Button pressed");
+            } else {
+                console.error("Error:", response.status);
+            }
+        });
+    }
+
+    function handleSaveClick() {
+        var colorSelect = document.getElementById("leds-color-select");
+        var sliderInput = document.getElementById("leds-brightness-slider");
+        var modeSelect = document.getElementById("leds-mode-select");
+        var sideButtonSelect = document.getElementById("side-button-mode-select");
+        var remoteButton1Select = document.getElementById("button1-mode-select");
+        var remoteButton2Select = document.getElementById("button2-mode-select");
+
+        var selectedColor = colorSelect.value;
+        var selectedSliderValue = sliderInput.value;
+        var selectedMode = modeSelect.value;
+        var selectedSideButton = sideButtonSelect.value;
+        var selectedRemoteButton1 = remoteButton1Select.value;
+        var selectedRemoteButton2 = remoteButton2Select.value;
+
+        var url = "/save_data";
+        var data = {
+            ledsColor: selectedColor,
+            ledsBrightness: selectedSliderValue,
+            ledsMode: selectedMode,
+            sideButtonMode: selectedSideButton,
+            remoteButton1Mode: selectedRemoteButton1,
+            remoteButton2Mode: selectedRemoteButton2
+        };
+
+        sendJsonRequest(url, data);
+    }
+
+    function sendJsonRequest(url, data) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                console.log("Request successful");
+            } else {
+                console.error("Request failed. Status:", xhr.status);
+            }
+        };
+        xhr.send(JSON.stringify(data));
+    }
+    </script>
+</body>
+</html>
